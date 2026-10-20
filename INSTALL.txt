@@ -1,0 +1,41 @@
+ENEMY SCALING - install guide (Across the Obelisk, Steam, Windows)
+
+Makes enemies tougher: more HP (x2 by default) and more damage (x1.5).
+
+In co-op, EVERY player must install this mod. Only the host's settings
+are used; the other players' mods copy the host's values automatically.
+
+1. Open the game folder.
+   In Steam, right-click "Across the Obelisk" > Manage > Browse local files.
+   You should see AcrossTheObelisk.exe. Keep this window open.
+
+2. Install BepInEx 5 (the mod loader). Skip this if you already use it.
+   - Go to https://github.com/BepInEx/BepInEx/releases
+   - Download the newest 5.4.x file named BepInEx_win_x64_5.4.x.x.zip
+     (NOT version 6, and NOT the x86 file).
+   - Open the zip and copy EVERYTHING inside it into the game folder, next to
+     AcrossTheObelisk.exe. You should end up with a "BepInEx" folder and a
+     "winhttp.dll" file in the game folder.
+
+3. Start the game once, wait for the main menu, then close it.
+   This creates the BepInEx\plugins folder.
+
+4. Copy EnemyScaling.dll (from this zip) into the game folder's
+   BepInEx\plugins folder.
+
+5. Start the game. Enemies now have more HP and hit harder.
+
+Changing the numbers (host or solo player)
+- Open BepInEx\config\com.cojoco.enemyscaling.cfg in Notepad (it appears
+  after the first start with the mod) and change HpMultiplier,
+  BossHpMultiplier or DamageMultiplier. Restart the game afterwards.
+- Enabled = false turns the mod off.
+
+Troubleshooting
+- Nothing happens: right-click EnemyScaling.dll > Properties and tick
+  "Unblock" if it is shown, then OK. Check that antivirus did not remove it.
+- Check BepInEx\LogOutput.log: it should say "Enemy Scaling 0.1.0 loaded",
+  and list each enemy's HP when a combat starts.
+- To uninstall, delete EnemyScaling.dll from BepInEx\plugins.
+
+Back up your save before using it on a run you care about.
