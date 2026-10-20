@@ -4,6 +4,11 @@ A BepInEx 5 mod for **Across the Obelisk** that makes enemies tougher: it multip
 
 **Status:** builds and is based on reading the game code; not yet tested in game. Back up your save before using it on a run you care about.
 
+## Related mods
+
+- [More Heroes](https://github.com/cojoco/ato-more-heroes): up to 8 heroes in a single-player run. Needs Enemy Scaling.
+- [More Players](https://github.com/cojoco/ato-more-players): co-op with more than 4 heroes and rooms for up to 8 players. Needs More Heroes.
+
 ## What it does
 
 - **Enemy HP** is multiplied when each enemy is created, after the game's own NG+, challenge-trait and sandbox HP changes. The HP bar shows the new max HP. Bosses (`NpcData.IsBoss`) use their own multiplier.
