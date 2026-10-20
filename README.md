@@ -2,7 +2,7 @@
 
 A BepInEx 5 mod for **Across the Obelisk** that makes enemies tougher: it multiplies enemy HP and enemy card damage by configurable factors. It works in the normal 4-hero game, solo or co-op. (It is also the first step of a larger "8 heroes" project, where enemies need to scale up for a bigger party.)
 
-**Status:** builds and is based on reading the game code; not yet tested in game. Back up your save before using it on a run you care about.
+**Status:** used in single-player runs since 2026-10-19 (together with More Heroes); enemy HP scaling is confirmed in game (the log shows HP x2). Co-op has not been tested yet. Back up your save before using it on a run you care about.
 
 ## Related mods
 
