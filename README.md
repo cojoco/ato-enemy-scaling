@@ -13,6 +13,7 @@ A BepInEx 5 mod for **Across the Obelisk** that makes enemies tougher: it multip
 
 - **Enemy HP** is multiplied when each enemy is created, after the game's own NG+, challenge-trait and sandbox HP changes. The HP bar shows the new max HP. Bosses (`NpcData.IsBoss`) use their own multiplier.
 - **Enemy damage** is multiplied after all of the enemy's own damage bonuses (NG+, traits, items, sandbox). The numbers shown on enemy cards and in attack previews include the multiplier, because the game computes them with the same method.
+- **AoE damage** (enemy cards that hit every hero at once: "All heroes" and "Global" cards) has its own multiplier, `AoeDamageMultiplier`, which is `1.0` (unchanged) by default.
 - **Summoned enemies** (minions created during combat) are scaled too, unless `ScaleSummons` is off. An enemy that transforms (metamorph/evolve) is treated as the same enemy and always scaled.
 - Results are rounded to whole numbers and never drop below 1.
 
@@ -23,7 +24,8 @@ A BepInEx 5 mod for **Across the Obelisk** that makes enemies tougher: it multip
 | `[General] Enabled` | `true` | Turn scaling on or off |
 | `[Scaling] HpMultiplier` | `2.0` | Max HP multiplier for enemies that are not bosses |
 | `[Scaling] BossHpMultiplier` | `2.0` | Max HP multiplier for bosses (set it equal to `HpMultiplier` to treat bosses the same) |
-| `[Scaling] DamageMultiplier` | `1.5` | Enemy damage multiplier |
+| `[Scaling] DamageMultiplier` | `1.5` | Damage multiplier for enemy cards that hit one target |
+| `[Scaling] AoeDamageMultiplier` | `1.0` | Damage multiplier for enemy cards that hit every hero (`1.0` = unchanged) |
 | `[Scaling] ScaleSummons` | `true` | Also scale HP and damage of enemies summoned mid-combat |
 
 Saved values in the `.cfg` file override the defaults above. Restart the game after changing them (BepInEx does not reload plugins or config while the game runs).
@@ -32,6 +34,7 @@ Saved values in the `.cfg` file override the defaults above. Restart the game af
 
 - **Damage over time and curses** that enemies put on heroes (burn, bleed, poison, and so on). Their damage comes from the number of charges on the hero, not from the enemy's attack, so it is unchanged. Enemies that apply more charges are unchanged too.
 - **Extra damage from curse stacks on the target** (`IncreasedCursedDamagePerStack`) is added after the multiplier, so it is not multiplied.
+- **Enemy damage from items, traits and pets** has no card, so it always uses `DamageMultiplier`, never `AoeDamageMultiplier`.
 - **Thorns and other reactive damage** from enemy auras, and any damage that does not go through `Character.DamageWithCharacterBonus`.
 - **Enemy shields/block, healing, speed and status effects** are unchanged.
 - Enemy cards that damage the enemy itself are multiplied too (same code path); this is rare.
@@ -45,6 +48,7 @@ The mod handles the second part for you: **the host's settings win**. When the h
 
 - If a player without the mod joins, their enemies are not scaled and the game will keep finding mismatches (HP corrections or combat reloads). Everyone should install it.
 - If the host does not have the mod (or has a version without this feature), players who do have it turn scaling off, to stay in sync with the host, and log a warning.
+- A host on an older version does not publish `AoeDamageMultiplier`; players then scale AoE cards with the host's `DamageMultiplier`, as that version does.
 - The settings are published once, when the room is created. Changing the host's config needs a game restart and a new room anyway.
 
 ## Logs
@@ -69,8 +73,9 @@ The mod handles the second part for you: **the host's settings win**. When the h
 | `NPC.InitData` Postfix | Multiplies `Hp` and `HpCurrent`. `InitData` always restarts from `NpcData.Hp`, so the game calling it several times for one enemy does not stack the multiplier. |
 | `BattleMatch.BattleTeamManager.CreateNPC` Prefix/Finalizer | Marks summons and resumed-combat spawns for the HP patch and the log. |
 | `NPCItem.Init` Postfix | Logs one line per enemy that appears on screen. |
-| `Character.DamageWithCharacterBonus` Postfix | Multiplies the result when the caster is an enemy (also used for the displayed numbers). |
-| `NetworkManager.OnCreatedRoom` Postfix | Host publishes its settings as Photon room properties (`es_on`, `es_hp`, `es_bosshp`, `es_dmg`, `es_summons`). |
+| `Character.DamageWithCharacterBonus` Postfix | Multiplies the result when the caster is an enemy (also used for the displayed numbers). Uses the AoE multiplier when the current card's `TargetType` is `Global`. |
+| `DamageMechanics.DealDamageToTarget`, `CardRealtimeData.UpdatePrecalculatedDamages` Prefix/Postfix | Record the card being resolved, because `DamageWithCharacterBonus` does not receive it. |
+| `NetworkManager.OnCreatedRoom` Postfix | Host publishes its settings as Photon room properties (`es_on`, `es_hp`, `es_bosshp`, `es_dmg`, `es_aoedmg`, `es_summons`). |
 
 Resumed combats: `MatchManager.FixTOTALCo` recreates each enemy (which runs `InitData`, so it is scaled) and then overwrites `HpCurrent` and `Hp` with the saved values, which were saved already scaled. So HP is neither scaled twice nor lost.
 

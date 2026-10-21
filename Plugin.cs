@@ -18,6 +18,7 @@ namespace EnemyScaling
         internal static ConfigEntry<float> HpMultiplier;
         internal static ConfigEntry<float> BossHpMultiplier;
         internal static ConfigEntry<float> DamageMultiplier;
+        internal static ConfigEntry<float> AoeDamageMultiplier;
         internal static ConfigEntry<bool> ScaleSummons;
 
         private void Awake()
@@ -31,7 +32,9 @@ namespace EnemyScaling
             BossHpMultiplier = Config.Bind("Scaling", "BossHpMultiplier", 2.0f,
                 "Multiplies the max HP of bosses. Set it to the same value as HpMultiplier to treat bosses like everyone else.");
             DamageMultiplier = Config.Bind("Scaling", "DamageMultiplier", 1.5f,
-                "Multiplies the damage of enemy cards (applied after all of the enemy's own damage bonuses).");
+                "Multiplies the damage of enemy cards that hit one target (applied after all of the enemy's own damage bonuses).");
+            AoeDamageMultiplier = Config.Bind("Scaling", "AoeDamageMultiplier", 1.0f,
+                "Multiplies the damage of enemy cards that hit every hero at once (\"All heroes\" and \"Global\" cards). 1.0 leaves them unchanged.");
             ScaleSummons = Config.Bind("Scaling", "ScaleSummons", true,
                 "Also scale the HP and damage of enemies summoned during combat.");
 

@@ -14,12 +14,14 @@ namespace EnemyScaling
         private const string KeyHp = "es_hp";
         private const string KeyBossHp = "es_bosshp";
         private const string KeyDamage = "es_dmg";
+        private const string KeyAoeDamage = "es_aoedmg";
         private const string KeySummons = "es_summons";
 
         public bool Enabled;
         public float Hp;
         public float BossHp;
         public float Damage;
+        public float AoeDamage;
         public bool Summons;
         public string Source;
 
@@ -34,6 +36,7 @@ namespace EnemyScaling
                 Hp = Clamp(Plugin.HpMultiplier.Value),
                 BossHp = Clamp(Plugin.BossHpMultiplier.Value),
                 Damage = Clamp(Plugin.DamageMultiplier.Value),
+                AoeDamage = Clamp(Plugin.AoeDamageMultiplier.Value),
                 Summons = Plugin.ScaleSummons.Value,
                 Source = "local config",
             };
@@ -61,14 +64,17 @@ namespace EnemyScaling
                     warnedNoHostSettings = true;
                     Plugin.Log.LogWarning("Co-op game, but the host did not publish Enemy Scaling settings (host has no mod or an old version). Scaling is OFF to stay in sync with the host.");
                 }
-                return new ScalingSettings { Enabled = false, Hp = 1f, BossHp = 1f, Damage = 1f, Summons = false, Source = "host has no settings" };
+                return new ScalingSettings { Enabled = false, Hp = 1f, BossHp = 1f, Damage = 1f, AoeDamage = 1f, Summons = false, Source = "host has no settings" };
             }
+            float damage = Clamp(ReadFloat(props, KeyDamage, 1f));
             return new ScalingSettings
             {
                 Enabled = ReadBool(props, KeyEnabled, false),
                 Hp = Clamp(ReadFloat(props, KeyHp, 1f)),
                 BossHp = Clamp(ReadFloat(props, KeyBossHp, 1f)),
-                Damage = Clamp(ReadFloat(props, KeyDamage, 1f)),
+                Damage = damage,
+                // A host on a version without this key scales AoE cards like any other card.
+                AoeDamage = Clamp(ReadFloat(props, KeyAoeDamage, damage)),
                 Summons = ReadBool(props, KeySummons, true),
                 Source = "host's room settings",
             };
@@ -88,6 +94,7 @@ namespace EnemyScaling
                 { KeyHp, s.Hp },
                 { KeyBossHp, s.BossHp },
                 { KeyDamage, s.Damage },
+                { KeyAoeDamage, s.AoeDamage },
                 { KeySummons, s.Summons },
             };
             PhotonNetwork.CurrentRoom.SetCustomProperties(table);
@@ -111,7 +118,7 @@ namespace EnemyScaling
             {
                 return "disabled";
             }
-            return string.Format(CultureInfo.InvariantCulture, "HP x{0}, boss HP x{1}, damage x{2}, summons {3}", Hp, BossHp, Damage, Summons ? "scaled" : "not scaled");
+            return string.Format(CultureInfo.InvariantCulture, "HP x{0}, boss HP x{1}, damage x{2}, AoE damage x{3}, summons {4}", Hp, BossHp, Damage, AoeDamage, Summons ? "scaled" : "not scaled");
         }
 
         private static bool InMultiplayerRoom()
