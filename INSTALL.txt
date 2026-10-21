@@ -28,13 +28,16 @@ are used; the other players' mods copy the host's values automatically.
 Changing the numbers (host or solo player)
 - Open BepInEx\config\com.cojoco.enemyscaling.cfg in Notepad (it appears
   after the first start with the mod) and change HpMultiplier,
-  BossHpMultiplier or DamageMultiplier. Restart the game afterwards.
+  BossHpMultiplier, DamageMultiplier or AoeDamageMultiplier. Restart the
+  game afterwards.
+- AoeDamageMultiplier is for enemy attacks that hit all heroes at once.
+  It is 1.0 by default, so those attacks are not made stronger.
 - Enabled = false turns the mod off.
 
 Troubleshooting
 - Nothing happens: right-click EnemyScaling.dll > Properties and tick
   "Unblock" if it is shown, then OK. Check that antivirus did not remove it.
-- Check BepInEx\LogOutput.log: it should say "Enemy Scaling 0.1.0 loaded",
+- Check BepInEx\LogOutput.log: it should say "Enemy Scaling <version> loaded",
   and list each enemy's HP when a combat starts.
 - To uninstall, delete EnemyScaling.dll from BepInEx\plugins.
 
