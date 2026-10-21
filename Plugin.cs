@@ -10,7 +10,7 @@ namespace EnemyScaling
     {
         public const string PluginGuid = "com.cojoco.enemyscaling";
         public const string PluginName = "Enemy Scaling";
-        public const string PluginVersion = "0.2.0";
+        public const string PluginVersion = "0.2.1";
 
         internal static ManualLogSource Log;
 

@@ -16,6 +16,7 @@ A BepInEx 5 mod for **Across the Obelisk** that makes enemies tougher: it multip
 - **AoE damage** (enemy cards that hit every hero at once: "All heroes" and "Global" cards) has its own multiplier, `AoeDamageMultiplier`, which is `1.0` (unchanged) by default.
 - **Summoned enemies** (minions created during combat) are scaled too, unless `ScaleSummons` is off. An enemy that transforms (metamorph/evolve) is treated as the same enemy and always scaled.
 - Results are rounded to whole numbers and never drop below 1.
+- **No Steam leaderboards.** Scores from runs played with this mod installed are not posted to the Steam leaderboards (normal, Obelisk, Singularity and weekly), so modded runs do not mix with vanilla ones. The log says "Steam leaderboard score not posted" when a run ends.
 
 ## Settings (`BepInEx/config/com.cojoco.enemyscaling.cfg`)
 
@@ -55,7 +56,7 @@ The mod handles the second part for you: **the host's settings win**. When the h
 
 `BepInEx/LogOutput.log` gets:
 
-- `Enemy Scaling 0.2.0 loaded. Local settings: ...` at startup.
+- `Enemy Scaling <version> loaded. Local settings: ...` at startup.
 - `Published scaling settings to the co-op room: ...` on the host of a co-op room.
 - `Scaling settings in use (<source>: ...)` the first time an enemy spawns, and whenever the values change. `<source>` is `local config`, `local config (host)` or `host's room settings`.
 - One line per enemy that appears: `Enemy <name> (<id>) [boss] [summon]: HP <base> -> <scaled> (x<multiplier>)`. For a combat resumed from a save it adds `(resumed combat: saved HP is restored next)`: the HP shown on screen is the saved HP, which was already scaled when it was saved.
