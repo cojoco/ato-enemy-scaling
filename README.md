@@ -55,7 +55,7 @@ The mod handles the second part for you: **the host's settings win**. When the h
 
 `BepInEx/LogOutput.log` gets:
 
-- `Enemy Scaling 0.1.0 loaded. Local settings: ...` at startup.
+- `Enemy Scaling 0.2.0 loaded. Local settings: ...` at startup.
 - `Published scaling settings to the co-op room: ...` on the host of a co-op room.
 - `Scaling settings in use (<source>: ...)` the first time an enemy spawns, and whenever the values change. `<source>` is `local config`, `local config (host)` or `host's room settings`.
 - One line per enemy that appears: `Enemy <name> (<id>) [boss] [summon]: HP <base> -> <scaled> (x<multiplier>)`. For a combat resumed from a save it adds `(resumed combat: saved HP is restored next)`: the HP shown on screen is the saved HP, which was already scaled when it was saved.
