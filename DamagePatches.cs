@@ -26,7 +26,8 @@ namespace EnemyScaling
                 {
                     return;
                 }
-                float multiplier = CardContext.IsAoe() ? s.AoeDamage : s.Damage;
+                int heroes = ScalingSettings.HeroCount();
+                float multiplier = CardContext.IsAoe() ? s.AoeDamageFor(heroes) : s.DamageFor(heroes);
                 if (Math.Abs(multiplier - 1f) < 0.0001f)
                 {
                     return;

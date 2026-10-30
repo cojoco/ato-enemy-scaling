@@ -14,6 +14,7 @@ A BepInEx 5 mod for **Across the Obelisk** that makes enemies tougher: it multip
 - **Enemy HP** is multiplied when each enemy is created, after the game's own NG+, challenge-trait and sandbox HP changes. The HP bar shows the new max HP. Bosses (`NpcData.IsBoss`) use their own multiplier.
 - **Enemy damage** is multiplied after all of the enemy's own damage bonuses (NG+, traits, items, sandbox). The numbers shown on enemy cards and in attack previews include the multiplier, because the game computes them with the same method.
 - **AoE damage** (enemy cards that hit every hero at once: "All heroes" and "Global" cards) has its own multiplier, `AoeDamageMultiplier`, which is `1.0` (unchanged) by default.
+- **Bigger teams** (with [More Heroes](https://github.com/cojoco/ato-more-heroes) or any mod that adds heroes): the multipliers above are for a 4-hero team, and each hero beyond 4 adds a configurable fraction of them: `multiplier x (1 + PerExtraHero x (heroes - 4))`. The defaults double enemy HP and give x1.5 single-target damage with 8 heroes (on top of the base multipliers). The hero count is read from the game's own team, so Enemy Scaling does not need More Heroes; with a normal 4-hero team these settings do nothing.
 - **Summoned enemies** (minions created during combat) are scaled too, unless `ScaleSummons` is off. An enemy that transforms (metamorph/evolve) is treated as the same enemy and always scaled.
 - Results are rounded to whole numbers and never drop below 1.
 - **No Steam leaderboards.** Scores from runs played with this mod installed are not posted to the Steam leaderboards (normal, Obelisk, Singularity and weekly), so modded runs do not mix with vanilla ones. The log says "Steam leaderboard score not posted" when a run ends.
@@ -28,6 +29,14 @@ A BepInEx 5 mod for **Across the Obelisk** that makes enemies tougher: it multip
 | `[Scaling] DamageMultiplier` | `1.5` | Damage multiplier for enemy cards that hit one target |
 | `[Scaling] AoeDamageMultiplier` | `1.0` | Damage multiplier for enemy cards that hit every hero (`1.0` = unchanged) |
 | `[Scaling] ScaleSummons` | `true` | Also scale HP and damage of enemies summoned mid-combat |
+| `[HeroCount] HpPerExtraHero` | `0.25` | Each hero beyond 4 adds this fraction of `HpMultiplier` (8 heroes: x2) |
+| `[HeroCount] BossHpPerExtraHero` | `0.25` | The same for `BossHpMultiplier` |
+| `[HeroCount] DamagePerExtraHero` | `0.125` | The same for `DamageMultiplier` (8 heroes: x1.5) |
+| `[HeroCount] AoeDamagePerExtraHero` | `0` | The same for `AoeDamageMultiplier`; 0 because those cards already hit every extra hero |
+
+With 5 heroes and the defaults (base `1.0`): HP x1.25, damage x1.125; 6 heroes: x1.5 / x1.25; 7: x1.75 / x1.375; 8: x2 / x1.5.
+
+**Upgrading from 0.2.x with More Heroes:** 0.2.x had no hero-count settings, so the base multipliers (`2.0` / `2.0` / `1.5`) were meant for 8 heroes. With 0.3.0 they would be applied on top of the hero-count scaling (x4 HP with 8 heroes). Set `HpMultiplier`, `BossHpMultiplier` and `DamageMultiplier` to `1.0` to get the 0.2.x strength with 8 heroes and less with 5-7.
 
 Saved values in the `.cfg` file override the defaults above. Restart the game after changing them (BepInEx does not reload plugins or config while the game runs).
 
@@ -50,6 +59,7 @@ The mod handles the second part for you: **the host's settings win**. When the h
 - If a player without the mod joins, their enemies are not scaled and the game will keep finding mismatches (HP corrections or combat reloads). Everyone should install it.
 - If the host does not have the mod (or has a version without this feature), players who do have it turn scaling off, to stay in sync with the host, and log a warning.
 - A host on an older version does not publish `AoeDamageMultiplier`; players then scale AoE cards with the host's `DamageMultiplier`, as that version does.
+- A host on a version before 0.3.0 does not publish the `[HeroCount]` settings; players then use 0 (no hero-count scaling), as that version does. Every player sees the same team, so the hero count is the same for everyone.
 - The settings are published once, when the room is created. Changing the host's config needs a game restart and a new room anyway.
 
 ## Logs
@@ -58,7 +68,7 @@ The mod handles the second part for you: **the host's settings win**. When the h
 
 - `Enemy Scaling <version> loaded. Local settings: ...` at startup.
 - `Published scaling settings to the co-op room: ...` on the host of a co-op room.
-- `Scaling settings in use (<source>: ...)` the first time an enemy spawns, and whenever the values change. `<source>` is `local config`, `local config (host)` or `host's room settings`.
+- `Scaling settings in use (<source>: ...; with N heroes: HP x..., ...)` the first time an enemy spawns, and whenever the values or the hero count change. `<source>` is `local config`, `local config (host)` or `host's room settings`.
 - One line per enemy that appears: `Enemy <name> (<id>) [boss] [summon]: HP <base> -> <scaled> (x<multiplier>)`. For a combat resumed from a save it adds `(resumed combat: saved HP is restored next)`: the HP shown on screen is the saved HP, which was already scaled when it was saved.
 
 ## Install
@@ -76,7 +86,7 @@ The mod handles the second part for you: **the host's settings win**. When the h
 | `NPCItem.Init` Postfix | Logs one line per enemy that appears on screen. |
 | `Character.DamageWithCharacterBonus` Postfix | Multiplies the result when the caster is an enemy (also used for the displayed numbers). Uses the AoE multiplier when the current card's `TargetType` is `Global`. |
 | `DamageMechanics.DealDamageToTarget`, `CardRealtimeData.UpdatePrecalculatedDamages` Prefix/Postfix | Record the card being resolved, because `DamageWithCharacterBonus` does not receive it. |
-| `NetworkManager.OnCreatedRoom` Postfix | Host publishes its settings as Photon room properties (`es_on`, `es_hp`, `es_bosshp`, `es_dmg`, `es_aoedmg`, `es_summons`). |
+| `NetworkManager.OnCreatedRoom` Postfix | Host publishes its settings as Photon room properties (`es_on`, `es_hp`, `es_bosshp`, `es_dmg`, `es_aoedmg`, `es_summons`, and `es_hp_hero`, `es_bosshp_hero`, `es_dmg_hero`, `es_aoedmg_hero` for the hero-count settings). |
 
 Resumed combats: `MatchManager.FixTOTALCo` recreates each enemy (which runs `InitData`, so it is scaled) and then overwrites `HpCurrent` and `Hp` with the saved values, which were saved already scaled. So HP is neither scaled twice nor lost.
 

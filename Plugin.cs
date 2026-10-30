@@ -10,7 +10,7 @@ namespace EnemyScaling
     {
         public const string PluginGuid = "com.cojoco.enemyscaling";
         public const string PluginName = "Enemy Scaling";
-        public const string PluginVersion = "0.2.1";
+        public const string PluginVersion = "0.3.0";
 
         internal static ManualLogSource Log;
 
@@ -20,6 +20,10 @@ namespace EnemyScaling
         internal static ConfigEntry<float> DamageMultiplier;
         internal static ConfigEntry<float> AoeDamageMultiplier;
         internal static ConfigEntry<bool> ScaleSummons;
+        internal static ConfigEntry<float> HpPerExtraHero;
+        internal static ConfigEntry<float> BossHpPerExtraHero;
+        internal static ConfigEntry<float> DamagePerExtraHero;
+        internal static ConfigEntry<float> AoeDamagePerExtraHero;
 
         private void Awake()
         {
@@ -37,6 +41,18 @@ namespace EnemyScaling
                 "Multiplies the damage of enemy cards that hit every hero at once (\"All heroes\" and \"Global\" cards). 1.0 leaves them unchanged.");
             ScaleSummons = Config.Bind("Scaling", "ScaleSummons", true,
                 "Also scale the HP and damage of enemies summoned during combat.");
+
+            const string perHero = " The multipliers above are for a team of 4 heroes. With more heroes (e.g. with the More Heroes mod), each hero beyond 4 " +
+                                   "adds this fraction of the multiplier: multiplier x (1 + value x (heroes - 4)). 0 = the same for any team size. " +
+                                   "No effect on a normal 4-hero team.";
+            HpPerExtraHero = Config.Bind("HeroCount", "HpPerExtraHero", 0.25f,
+                "Enemy HP (not bosses) for each hero beyond 4. 0.25 doubles HP with 8 heroes." + perHero);
+            BossHpPerExtraHero = Config.Bind("HeroCount", "BossHpPerExtraHero", 0.25f,
+                "Boss HP for each hero beyond 4. 0.25 doubles boss HP with 8 heroes." + perHero);
+            DamagePerExtraHero = Config.Bind("HeroCount", "DamagePerExtraHero", 0.125f,
+                "Single-target enemy damage for each hero beyond 4. 0.125 gives x1.5 with 8 heroes." + perHero);
+            AoeDamagePerExtraHero = Config.Bind("HeroCount", "AoeDamagePerExtraHero", 0f,
+                "\"All heroes\" / \"Global\" enemy damage for each hero beyond 4. 0 by default: those cards already hit every extra hero." + perHero);
 
             new Harmony(PluginGuid).PatchAll();
 

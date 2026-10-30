@@ -53,7 +53,8 @@ namespace EnemyScaling
                     info.Skipped = "summon, ScaleSummons off";
                     return;
                 }
-                float mult = __instance.NpcData.IsBoss ? s.BossHp : s.Hp;
+                int heroes = ScalingSettings.HeroCount();
+                float mult = __instance.NpcData.IsBoss ? s.BossHpFor(heroes) : s.HpFor(heroes);
                 info.Multiplier = mult;
                 if (Math.Abs(mult - 1f) < 0.0001f)
                 {
